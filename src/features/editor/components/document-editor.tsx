@@ -28,7 +28,9 @@ export function DocumentEditor({ doc, currentUser }: { doc: DocumentDetail; curr
   // Merge title and content edits into a single debounced save.
   const latest = useState<Patch>(() => ({}))[0];
   const { state, schedule, retry } = useAutosave<Patch>(async (patch) => {
-    const res = await saveDocumentAction(doc.id, patch);
+    // Send a fresh plain-JSON copy. Re-sending the same (mutated) object to a server
+    // action makes React encode it as a client reference, which the server rejects.
+    const res = await saveDocumentAction(doc.id, JSON.parse(JSON.stringify(patch)) as Patch);
     return res.ok;
   });
   const queue = (patch: Patch) => schedule(Object.assign(latest, patch));
