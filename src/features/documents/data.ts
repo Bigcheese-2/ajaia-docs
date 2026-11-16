@@ -15,7 +15,7 @@ function toDetail(doc: MockDocument, viewerId: string): DocumentDetail {
     id: doc.id,
     title: doc.title,
     content: doc.content,
-    preview: contentPreview(doc.content),
+    preview: contentPreview(doc.content, 140, doc.title),
     updatedAt: doc.updatedAt,
     owner: userById(doc.ownerId),
     access: doc.ownerId === viewerId ? "owner" : "editor",
@@ -56,6 +56,22 @@ export async function createDocument(userId: string, title = "Untitled document"
   };
   mockDocuments.unshift(doc);
   return doc.id;
+}
+
+/** Owner or editor. Returns the new updatedAt, or null when the user can't edit. */
+export async function updateDocument(
+  id: string,
+  userId: string,
+  patch: { title?: string; content?: MockDocument["content"] },
+): Promise<string | null> {
+  const doc = mockDocuments.find((d) => d.id === id);
+  if (!doc || !canView(doc, userId)) return null;
+  if (patch.title !== undefined) doc.title = patch.title;
+  // Store a plain copy: objects decoded from a server action's arguments are
+  // tied to that request and can't be re-serialized in a later render.
+  if (patch.content !== undefined) doc.content = JSON.parse(JSON.stringify(patch.content));
+  doc.updatedAt = new Date().toISOString();
+  return doc.updatedAt;
 }
 
 /** Owner-only. Returns false when the doc is missing or the user isn't the owner. */
