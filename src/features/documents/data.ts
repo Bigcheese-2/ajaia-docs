@@ -81,7 +81,3 @@ export async function deleteDocument(id: string, userId: string): Promise<boolea
   mockDocuments.splice(index, 1);
   return true;
 }
-
-export async function listUsers(): Promise<UserSummary[]> {
-  return mockUsers;
-}

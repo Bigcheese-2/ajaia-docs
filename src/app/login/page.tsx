@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { LoginScreen } from "@/features/auth/components/login-screen";
-import { listUsers } from "@/features/documents/data";
+import { listUsers } from "@/features/auth/users";
 
 export const metadata: Metadata = { title: "Sign in · Ajaia Docs" };
 

@@ -1,20 +1,28 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
 import { ArrowRight, Info, Loader2 } from "lucide-react";
 import { Logo } from "@/design-system/patterns/logo";
 import { UserAvatar } from "@/design-system/patterns/user-avatar";
 import type { UserSummary } from "@/features/documents/types";
+import { signInAction } from "../actions";
 
 export function LoginScreen({ users }: { users: UserSummary[] }) {
-  const router = useRouter();
   const [pendingId, setPendingId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [, startTransition] = useTransition();
 
   const signIn = (user: UserSummary) => {
     setPendingId(user.id);
-    // UI phase: navigates only. Integration phase sets the session cookie first.
-    router.push("/");
+    setError(null);
+    startTransition(async () => {
+      // Redirects on success; only returns when something went wrong.
+      const res = await signInAction(user.id);
+      if (res && !res.ok) {
+        setError(res.error);
+        setPendingId(null);
+      }
+    });
   };
 
   return (
@@ -50,6 +58,11 @@ export function LoginScreen({ users }: { users: UserSummary[] }) {
               </li>
             ))}
           </ul>
+          {error && (
+            <p role="alert" className="mt-3 text-sm text-destructive">
+              {error}
+            </p>
+          )}
 
           <div className="mt-6 flex gap-2 rounded-lg bg-muted p-3 text-xs text-muted-foreground">
             <Info className="mt-0.5 size-3.5 shrink-0" />

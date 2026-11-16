@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { getCurrentUser } from "@/features/auth/session";
+import { requireUser } from "@/features/auth/session";
 import type { JSONContent } from "@tiptap/react";
 import { z } from "zod";
 import { createDocument, deleteDocument, updateDocument } from "./data";
@@ -28,7 +28,7 @@ export async function saveDocumentAction(
 ): Promise<SaveResult> {
   const parsed = saveSchema.safeParse(patch);
   if (!parsed.success) return { ok: false, error: parsed.error.issues[0].message };
-  const user = await getCurrentUser();
+  const user = await requireUser();
   const updatedAt = await updateDocument(id, user.id, parsed.data as { title?: string; content?: JSONContent });
   if (!updatedAt) return { ok: false, error: "You don't have access to edit this document." };
   revalidatePath("/");
@@ -36,13 +36,13 @@ export async function saveDocumentAction(
 }
 
 export async function createDocumentAction() {
-  const user = await getCurrentUser();
+  const user = await requireUser();
   const id = await createDocument(user.id);
   redirect(`/documents/${id}`);
 }
 
 export async function deleteDocumentAction(id: string): Promise<{ ok: boolean; error?: string }> {
-  const user = await getCurrentUser();
+  const user = await requireUser();
   const ok = await deleteDocument(id, user.id);
   if (!ok) return { ok: false, error: "Only the owner can delete this document." };
   revalidatePath("/");
