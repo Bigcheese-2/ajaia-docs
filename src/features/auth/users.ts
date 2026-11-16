@@ -1,12 +1,13 @@
 import "server-only";
-import { mockUsers } from "@/features/documents/mock-data";
+import { db } from "@/lib/db";
 import type { UserSummary } from "@/features/documents/types";
 
-/** User data access. Backed by fixtures until the database branch lands. */
+export const userSelect = { id: true, name: true, email: true, avatarColor: true } as const;
+
 export async function findUserById(id: string): Promise<UserSummary | null> {
-  return mockUsers.find((u) => u.id === id) ?? null;
+  return db.user.findUnique({ where: { id }, select: userSelect });
 }
 
 export async function listUsers(): Promise<UserSummary[]> {
-  return mockUsers;
+  return db.user.findMany({ select: userSelect, orderBy: { name: "asc" } });
 }
