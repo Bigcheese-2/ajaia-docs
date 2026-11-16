@@ -21,7 +21,7 @@ export function UserMenu({ user }: { user: UserSummary }) {
     <DropdownMenu>
       <DropdownMenuTrigger
         aria-label="Account menu"
-        className="rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+        className="ml-1 rounded-full outline-none transition-opacity duration-150 hover:opacity-90 focus-visible:ring-2 focus-visible:ring-ring/50"
       >
         <UserAvatar user={user} />
       </DropdownMenuTrigger>

@@ -1,76 +1,56 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { Logo } from "@/design-system/patterns/logo";
-import { ThemeToggle } from "@/design-system/patterns/theme-toggle";
-import { Skeleton } from "@/design-system/primitives/skeleton";
+import { ThemeMenu } from "@/design-system/patterns/theme-menu";
+import { MobileNav } from "./mobile-nav";
 import { SidebarNav, type NavItem } from "./sidebar-nav";
 
+const SIDEBAR = "sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r bg-sidebar md:flex";
+const HEADER = "sticky top-0 z-30 flex h-16 items-center gap-2 border-b bg-background px-4 md:px-8";
+const MAIN = "mx-auto w-full max-w-5xl flex-1 px-4 py-8 md:px-8 md:py-10";
+
 /**
- * Workspace layout: fixed sidebar on desktop, compact top bar on mobile.
+ * Workspace layout: fixed sidebar on desktop, drawer navigation on mobile.
  * Feature code fills the slots; the shell owns no data.
  */
 export function AppShell({
   nav,
-  sidebarActions,
   userMenu,
   children,
 }: {
   nav: NavItem[];
-  sidebarActions?: React.ReactNode;
   userMenu?: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
     <div className="flex min-h-screen">
-      <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col gap-6 border-r bg-sidebar px-3 py-4 md:flex">
-        <Link href="/" className="px-2.5">
-          <Logo />
-        </Link>
-        {sidebarActions && <div className="flex flex-col gap-2">{sidebarActions}</div>}
-        <Suspense>
-          <SidebarNav items={nav} />
-        </Suspense>
-        <p className="mt-auto px-2.5 text-xs text-muted-foreground">Demo workspace</p>
+      <aside className={SIDEBAR}>
+        <div className="flex h-16 items-center px-5">
+          <Link href="/" className="rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ring/50">
+            <Logo />
+          </Link>
+        </div>
+        <div className="flex flex-1 flex-col gap-1 px-3 py-4">
+          <p className="px-2.5 pb-1 text-xs font-medium text-subtle-foreground">Documents</p>
+          <Suspense>
+            <SidebarNav items={nav} />
+          </Suspense>
+        </div>
+        <p className="border-t px-5 py-4 text-xs text-subtle-foreground">Demo workspace</p>
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b bg-background/80 px-4 backdrop-blur md:px-8">
+        <header className={HEADER}>
+          <MobileNav items={nav} />
           <Link href="/" className="md:hidden">
-            <Logo showText={false} />
+            <Logo />
           </Link>
-          <div className="ml-auto flex items-center gap-2">
-            <ThemeToggle />
+          <div className="ml-auto flex items-center gap-1.5">
+            <ThemeMenu />
             {userMenu}
           </div>
         </header>
-        <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 md:px-8">{children}</main>
-      </div>
-    </div>
-  );
-}
-
-/** Placeholder with the shell's exact geometry, shown while workspace data loads. */
-export function AppShellSkeleton({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="flex min-h-screen" aria-busy="true">
-      <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col gap-6 border-r bg-sidebar px-3 py-4 md:flex">
-        <Link href="/" className="px-2.5">
-          <Logo />
-        </Link>
-        <div className="flex flex-col gap-2 px-2.5">
-          {[0, 1, 2].map((i) => (
-            <Skeleton key={i} className="h-7 w-full" />
-          ))}
-        </div>
-      </aside>
-      <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b bg-background/80 px-4 md:px-8">
-          <Link href="/" className="md:hidden">
-            <Logo showText={false} />
-          </Link>
-          <Skeleton className="ml-auto size-8 rounded-full" />
-        </header>
-        <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 md:px-8">{children}</main>
+        <main className={MAIN}>{children}</main>
       </div>
     </div>
   );

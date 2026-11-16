@@ -7,7 +7,8 @@ import { Placeholder } from "@tiptap/extension-placeholder";
 import { ArrowLeft } from "lucide-react";
 import { Badge } from "@/design-system/primitives/badge";
 import { Button } from "@/design-system/primitives/button";
-import { ThemeToggle } from "@/design-system/patterns/theme-toggle";
+import { ThemeMenu } from "@/design-system/patterns/theme-menu";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/design-system/primitives/tooltip";
 import { AvatarStack } from "@/design-system/patterns/user-avatar";
 import { saveDocumentAction } from "@/features/documents/actions";
 import type { DocumentDetail, UserSummary } from "@/features/documents/types";
@@ -49,12 +50,19 @@ export function DocumentEditor({ doc, currentUser }: { doc: DocumentDetail; curr
   });
 
   return (
-    <div className="min-h-screen bg-muted/40">
-      <header className="sticky top-0 z-20 border-b bg-background/90 backdrop-blur">
-        <div className="flex h-14 items-center gap-3 px-3 md:px-6">
-          <Button variant="ghost" size="icon" render={<Link href="/" />} nativeButton={false} aria-label="Back to documents">
-            <ArrowLeft />
-          </Button>
+    <div className="min-h-screen bg-background">
+      <header className="sticky top-0 z-20 border-b bg-surface">
+        <div className="flex h-16 items-center gap-2 px-3 md:gap-3 md:px-6">
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <Button variant="ghost" size="icon" render={<Link href="/" />} nativeButton={false} aria-label="Back to documents" />
+              }
+            >
+              <ArrowLeft />
+            </TooltipTrigger>
+            <TooltipContent side="bottom">Back to documents</TooltipContent>
+          </Tooltip>
           <div className="flex min-w-0 flex-1 items-center gap-3">
             <input
               value={title}
@@ -66,7 +74,7 @@ export function DocumentEditor({ doc, currentUser }: { doc: DocumentDetail; curr
               maxLength={120}
               aria-label="Document title"
               placeholder="Untitled document"
-              className="min-w-0 max-w-md flex-1 truncate rounded-md bg-transparent px-2 py-1 text-base font-medium outline-none hover:bg-muted focus:bg-muted focus:ring-2 focus:ring-ring/40"
+              className="h-9 min-w-24 max-w-[min(28rem,45vw)] truncate [field-sizing:content] rounded-md border border-transparent bg-transparent px-2 text-[15px] font-semibold tracking-tight transition-colors duration-150 outline-none hover:border-border focus:border-ring focus:ring-2 focus:ring-ring/30"
             />
             {isOwner ? (
               <Badge variant="secondary" className="hidden sm:inline-flex">Owner</Badge>
@@ -77,7 +85,7 @@ export function DocumentEditor({ doc, currentUser }: { doc: DocumentDetail; curr
               <SaveStatus state={state} onRetry={retry} />
             </span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 md:gap-2">
             <AvatarStack users={[doc.owner, ...doc.sharedWith]} className="hidden sm:flex" />
             <ShareDialog
               documentId={doc.id}
@@ -86,18 +94,18 @@ export function DocumentEditor({ doc, currentUser }: { doc: DocumentDetail; curr
               initialSharedWith={doc.sharedWith}
               canManage={isOwner}
             />
-            <ThemeToggle />
+            <ThemeMenu />
             <UserMenu user={currentUser} />
           </div>
         </div>
       </header>
 
-      <div className="sticky top-14 z-10 flex justify-center px-3 pt-3">
+      <div className="sticky top-16 z-10 flex justify-center border-b bg-background px-3 py-2">
         {editor ? <EditorToolbar editor={editor} /> : <div className="h-10" />}
       </div>
 
-      <main className="px-3 pt-4 pb-24">
-        <div className="doc-page mx-auto w-full max-w-[816px] rounded-lg border bg-background px-6 py-10 shadow-sm sm:px-16 sm:py-16">
+      <main className="px-3 pt-6 pb-24 sm:pt-8">
+        <div className="doc-page mx-auto w-full max-w-[816px] rounded-lg border bg-surface px-5 py-8 sm:px-16 sm:py-14">
           <EditorContent editor={editor} />
         </div>
         <p className="mt-3 text-center text-xs text-muted-foreground md:hidden">

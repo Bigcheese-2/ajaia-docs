@@ -1,12 +1,6 @@
-import { AppShellSkeleton } from "@/design-system/layouts/app-shell";
-import { DocumentsSkeleton } from "@/features/documents/components/documents-skeleton";
+import { FullPageLoader } from "@/design-system/patterns/full-page-loader";
 
-// Shown instantly when entering the workspace (e.g. back from a document)
-// while its layout queries the database.
+// Shown while the workspace layout loads the user and their documents.
 export default function Loading() {
-  return (
-    <AppShellSkeleton>
-      <DocumentsSkeleton />
-    </AppShellSkeleton>
-  );
+  return <FullPageLoader message="Loading your workspace…" />;
 }
