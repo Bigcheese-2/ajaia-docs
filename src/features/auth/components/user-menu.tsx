@@ -13,6 +13,7 @@ import {
 } from "@/design-system/primitives/dropdown-menu";
 import { UserAvatar } from "@/design-system/patterns/user-avatar";
 import type { UserSummary } from "@/features/documents/types";
+import { signOutAction } from "../actions";
 
 export function UserMenu({ user }: { user: UserSummary }) {
   const router = useRouter();
@@ -35,7 +36,7 @@ export function UserMenu({ user }: { user: UserSummary }) {
         <DropdownMenuItem onClick={() => router.push("/login")}>
           <Users /> Switch user
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => router.push("/login")}>
+        <DropdownMenuItem onClick={() => void signOutAction()}>
           <LogOut /> Log out
         </DropdownMenuItem>
       </DropdownMenuContent>
