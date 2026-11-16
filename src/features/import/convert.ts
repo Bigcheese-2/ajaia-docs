@@ -1,8 +1,8 @@
 import { generateJSON } from "@tiptap/html/server";
 import type { JSONContent } from "@tiptap/react";
-import DOMPurify from "isomorphic-dompurify";
 import mammoth from "mammoth";
 import { marked } from "marked";
+import sanitize from "sanitize-html";
 import { emptyDocument } from "@/features/documents/content";
 import { documentExtensions } from "@/features/editor/extensions";
 
@@ -10,8 +10,10 @@ import { documentExtensions } from "@/features/editor/extensions";
  * File import pipeline: file → HTML → sanitized HTML → editor JSON.
  *
  * Every format goes through HTML so there is one sanitizer and one parser.
- * DOMPurify strips scripts and handlers; parsing against the editor's own
+ * sanitize-html keeps only an allowlist of tags with no attributes (so no
+ * scripts, handlers or javascript: links); parsing against the editor's own
  * schema then drops anything the editor can't render (images, tables…).
+ * sanitize-html is pure JS: no DOM emulation, so it runs in serverless.
  */
 
 export type ImportFormat = "txt" | "md" | "docx";
@@ -47,7 +49,7 @@ export function plainTextToHtml(text: string): string {
 }
 
 export function sanitizeHtml(html: string): string {
-  const clean = DOMPurify.sanitize(html, { ALLOWED_TAGS, ALLOWED_ATTR: [] });
+  const clean = sanitize(html, { allowedTags: ALLOWED_TAGS, allowedAttributes: {} });
   // The editor supports H1–H3; keep deeper headings as headings, not plain text.
   return clean.replace(/<(\/?)h[4-6]>/g, "<$1h3>");
 }

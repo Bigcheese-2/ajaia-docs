@@ -5,7 +5,6 @@ import { redirect } from "next/navigation";
 import { requireUser } from "@/features/auth/session";
 import { createDocument } from "@/features/documents/data";
 import { validateImportFile } from "./constants";
-import { convertFile } from "./convert";
 
 export type ImportResult = { ok: false; error: string };
 
@@ -21,6 +20,9 @@ export async function importDocumentAction(formData: FormData): Promise<ImportRe
 
   let id: string;
   try {
+    // Loaded on demand: the parsers are heavy and only this action needs them,
+    // so pages that merely render the Import button stay light.
+    const { convertFile } = await import("./convert");
     const { title, content } = await convertFile(file.name, Buffer.from(await file.arrayBuffer()));
     id = await createDocument(user.id, title, content);
   } catch (error) {
