@@ -1,56 +1,92 @@
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 
+/**
+ * Demo data: three users and a few documents covering every access case
+ * (owned + shared, owned + private, shared with me). Idempotent: users are
+ * upserted by email and documents are only created if missing.
+ */
 const prisma = new PrismaClient();
 
-const users = [
-  { name: "Alice Johnson", email: "alice@demo.com", avatarColor: "#6366f1" },
-  { name: "Bob Smith", email: "bob@demo.com", avatarColor: "#10b981" },
-  { name: "Carol Lee", email: "carol@demo.com", avatarColor: "#f59e0b" },
+const users = {
+  alice: { name: "Alice Johnson", email: "alice@demo.com", avatarColor: "#6366f1" },
+  bob: { name: "Bob Smith", email: "bob@demo.com", avatarColor: "#10b981" },
+  carol: { name: "Carol Lee", email: "carol@demo.com", avatarColor: "#f59e0b" },
+};
+type DemoUser = keyof typeof users;
+
+const text = (value: string, marks?: string[]) => ({
+  type: "text",
+  text: value,
+  ...(marks && { marks: marks.map((type) => ({ type })) }),
+});
+const p = (...parts: (string | ReturnType<typeof text>)[]) => ({
+  type: "paragraph",
+  content: parts.map((part) => (typeof part === "string" ? text(part) : part)),
+});
+const h = (level: number, value: string) => ({ type: "heading", attrs: { level }, content: [text(value)] });
+const bullets = (...items: string[]) => ({
+  type: "bulletList",
+  content: items.map((item) => ({ type: "listItem", content: [p(item)] })),
+});
+const doc = (...content: object[]) => ({ type: "doc", content }) as Prisma.InputJsonValue;
+
+const documents: { title: string; owner: DemoUser; sharedWith: DemoUser[]; content: Prisma.InputJsonValue }[] = [
+  {
+    title: "Welcome to Ajaia Docs",
+    owner: "alice",
+    sharedWith: ["bob"],
+    content: doc(
+      h(1, "Welcome to Ajaia Docs"),
+      p("This document is owned by Alice and ", text("shared with Bob", ["bold"]), ". Try editing it as either user."),
+      bullets("Bold, italic and underline", "Headings and lists", "Autosave as you type"),
+    ),
+  },
+  {
+    title: "Q4 product roadmap",
+    owner: "alice",
+    sharedWith: ["bob", "carol"],
+    content: doc(
+      h(1, "Q4 product roadmap"),
+      p("Themes for the quarter: collaboration, search and reliability."),
+      bullets("Shared editing", "Faster search", "99.9% uptime"),
+    ),
+  },
+  {
+    title: "Team onboarding guide",
+    owner: "alice",
+    sharedWith: [],
+    content: doc(h(1, "Team onboarding guide"), p("Everything a new teammate needs in their first week.")),
+  },
+  {
+    title: "Design review notes",
+    owner: "bob",
+    sharedWith: ["alice"],
+    content: doc(h(2, "Design review notes"), p("Feedback from Tuesday's review of the editor toolbar.")),
+  },
 ];
 
-const welcomeContent = {
-  type: "doc",
-  content: [
-    { type: "heading", attrs: { level: 1 }, content: [{ type: "text", text: "Welcome to Ajaia Docs" }] },
-    {
-      type: "paragraph",
-      content: [
-        { type: "text", text: "This document is owned by Alice and " },
-        { type: "text", marks: [{ type: "bold" }], text: "shared with Bob" },
-        { type: "text", text: ". Try editing it as either user." },
-      ],
-    },
-    {
-      type: "bulletList",
-      content: [
-        { type: "listItem", content: [{ type: "paragraph", content: [{ type: "text", marks: [{ type: "italic" }], text: "Italic" }] }] },
-        { type: "listItem", content: [{ type: "paragraph", content: [{ type: "text", marks: [{ type: "underline" }], text: "Underline" }] }] },
-      ],
-    },
-  ],
-};
-
 async function main() {
-  const created = [];
-  for (const u of users) {
-    created.push(await prisma.user.upsert({ where: { email: u.email }, update: u, create: u }));
+  const ids = {} as Record<DemoUser, string>;
+  for (const [key, data] of Object.entries(users) as [DemoUser, (typeof users)[DemoUser]][]) {
+    const user = await prisma.user.upsert({ where: { email: data.email }, update: data, create: data });
+    ids[key] = user.id;
   }
-  const [alice, bob] = created;
 
-  const existing = await prisma.document.findFirst({
-    where: { ownerId: alice.id, title: "Welcome to Ajaia Docs" },
-  });
-  if (!existing) {
+  let created = 0;
+  for (const d of documents) {
+    const exists = await prisma.document.findFirst({ where: { ownerId: ids[d.owner], title: d.title } });
+    if (exists) continue;
     await prisma.document.create({
       data: {
-        title: "Welcome to Ajaia Docs",
-        content: welcomeContent,
-        ownerId: alice.id,
-        shares: { create: { userId: bob.id } },
+        title: d.title,
+        content: d.content,
+        ownerId: ids[d.owner],
+        shares: { create: d.sharedWith.map((u) => ({ userId: ids[u] })) },
       },
     });
+    created++;
   }
-  console.log(`Seeded ${created.length} users.`);
+  console.log(`Seeded ${Object.keys(ids).length} users and ${created} new documents.`);
 }
 
 main()
