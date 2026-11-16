@@ -4,6 +4,9 @@ import { listUsers } from "@/features/auth/users";
 
 export const metadata: Metadata = { title: "Sign in · Ajaia Docs" };
 
+// Users come from the database, so render per request rather than at build time.
+export const dynamic = "force-dynamic";
+
 export default async function LoginPage() {
   const users = await listUsers();
   return <LoginScreen users={users} />;
