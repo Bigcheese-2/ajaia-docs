@@ -15,6 +15,7 @@ import {
   DialogTrigger,
 } from "@/design-system/primitives/dialog";
 import { cn } from "@/lib/utils";
+import { importDocumentAction } from "../actions";
 import { IMPORT_ACCEPT, validateImportFile } from "../constants";
 
 function formatSize(bytes: number) {
@@ -45,11 +46,18 @@ export function ImportDialog() {
   const onImport = async () => {
     if (!file) return;
     setPending(true);
-    // UI phase: the server import endpoint is wired in the integration phase.
-    await new Promise((r) => setTimeout(r, 600));
+    setError(null);
+    const formData = new FormData();
+    formData.append("file", file);
+    // On success the action redirects to the new document; it only returns on failure.
+    const result = await importDocumentAction(formData);
+    if (result && !result.ok) {
+      setError(result.error);
+      setPending(false);
+      toast.error("Import failed");
+      return;
+    }
     toast.success(`Imported “${file.name}”`);
-    setOpen(false);
-    reset();
   };
 
   return (
