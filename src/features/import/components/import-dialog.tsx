@@ -78,7 +78,7 @@ export function ImportDialog() {
         </DialogHeader>
 
         {file ? (
-          <div className="flex items-center gap-3 rounded-lg border bg-muted/40 p-3">
+          <div className="flex items-center gap-3 rounded-lg border bg-background p-3 animate-in fade-in-0 duration-150">
             <span className="flex size-9 items-center justify-center rounded-md bg-primary/10 text-primary">
               <FileText className="size-4" />
             </span>
@@ -105,12 +105,12 @@ export function ImportDialog() {
               pick(e.dataTransfer.files[0]);
             }}
             className={cn(
-              "flex w-full flex-col items-center gap-2 rounded-xl border-2 border-dashed px-6 py-10 text-center transition-colors outline-none hover:border-primary/50 hover:bg-muted/40 focus-visible:ring-3 focus-visible:ring-ring/50",
+              "flex w-full flex-col items-center gap-2 rounded-lg border border-dashed bg-background px-6 py-10 text-center transition-colors duration-150 outline-none hover:border-primary/50 hover:bg-muted/40 focus-visible:ring-2 focus-visible:ring-ring/50",
               dragging && "border-primary bg-primary/5",
               error && "border-destructive/60",
             )}
           >
-            <span className="flex size-10 items-center justify-center rounded-full bg-muted">
+            <span className="flex size-10 items-center justify-center rounded-lg border bg-surface">
               <Upload className="size-5 text-muted-foreground" />
             </span>
             <span className="text-sm font-medium">Drop a file here or browse</span>

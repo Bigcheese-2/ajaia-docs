@@ -37,10 +37,10 @@ export function AvatarStack({ users, max = 3, className }: { users: Person[]; ma
   return (
     <div className={cn("flex -space-x-2", className)}>
       {shown.map((u) => (
-        <UserAvatar key={u.name} user={u} size="sm" className="ring-2 ring-background" />
+        <UserAvatar key={u.name} user={u} size="sm" className="ring-2 ring-surface" />
       ))}
       {extra > 0 && (
-        <span className="flex size-6 items-center justify-center rounded-full bg-muted text-[10px] font-medium ring-2 ring-background">
+        <span className="flex size-6 items-center justify-center rounded-full bg-muted text-[10px] font-medium ring-2 ring-surface">
           +{extra}
         </span>
       )}

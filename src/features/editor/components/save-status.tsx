@@ -12,12 +12,12 @@ export function SaveStatus({ state, onRetry }: { state: SaveState; onRetry: () =
       )}
       {state === "unsaved" && (
         <>
-          <CloudUpload className="size-3.5" /> Unsaved changes
+          <CloudUpload className="size-3.5 text-warning" /> Unsaved changes
         </>
       )}
       {state === "saved" && (
         <>
-          <Check className="size-3.5 text-emerald-500" /> Saved
+          <Check className="size-3.5 text-success" /> Saved
         </>
       )}
       {state === "error" && (

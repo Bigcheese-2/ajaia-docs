@@ -29,7 +29,7 @@ Bob can't share or delete it; only the owner can.
 - **Autosave:** saves 800 ms after you stop typing. A status shows *Saving / Saved / Unsaved / Couldn't save (Retry)*, and the browser warns before you leave with unsaved changes.
 - **File import:** `.txt`, `.md` or `.docx` up to **2 MB** becomes a new editable document. Formatting such as headings, bold, italic and lists carries over. Images, tables and embedded HTML are dropped.
 - **Sharing:** the owner grants or removes access by email. The dashboard separates **My documents** from **Shared with me**, and each doc shows owner and editor badges.
-- **Quality of life:** dark mode, loading skeletons, a friendly error page with *Try again*, 404 pages, and a responsive layout.
+- **Interface:** a calm, token-based design system (light, dark or system theme), a searchable document list, a mobile navigation drawer, branded full-page loaders, skeletons, subtle motion that respects *reduce motion*, a friendly error page with *Try again*, and 404 pages.
 
 ## Run locally
 

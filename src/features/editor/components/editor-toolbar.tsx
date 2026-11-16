@@ -76,10 +76,10 @@ export function EditorToolbar({ editor }: { editor: Editor }) {
     <div
       role="toolbar"
       aria-label="Formatting"
-      className="flex flex-wrap items-center gap-0.5 rounded-xl border bg-background/95 p-1 shadow-sm backdrop-blur"
+      className="flex max-w-full items-center gap-0.5 overflow-x-auto rounded-lg border bg-surface p-1 [scrollbar-width:none]"
     >
       {GROUPS.map((group, i) => (
-        <div key={i} className="flex items-center gap-0.5">
+        <div key={i} className="flex shrink-0 items-center gap-0.5">
           {i > 0 && <Separator orientation="vertical" className="mx-1 h-5" />}
           {group.map(({ key, label, shortcut, icon: Icon, run }) => (
             <Tooltip key={key}>
@@ -96,7 +96,7 @@ export function EditorToolbar({ editor }: { editor: Editor }) {
               >
                 <Icon />
               </TooltipTrigger>
-              <TooltipContent>
+              <TooltipContent side="bottom">
                 {label}
                 {shortcut && <span className="ml-2 opacity-60">{shortcut}</span>}
               </TooltipContent>
