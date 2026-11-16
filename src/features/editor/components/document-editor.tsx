@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useState } from "react";
 import { EditorContent, useEditor, type JSONContent } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
 import { Placeholder } from "@tiptap/extension-placeholder";
 import { ArrowLeft } from "lucide-react";
 import { Badge } from "@/design-system/primitives/badge";
@@ -14,6 +13,7 @@ import { saveDocumentAction } from "@/features/documents/actions";
 import type { DocumentDetail, UserSummary } from "@/features/documents/types";
 import { UserMenu } from "@/features/auth/components/user-menu";
 import { ShareDialog } from "@/features/sharing/components/share-dialog";
+import { documentExtensions } from "../extensions";
 import { useAutosave } from "../hooks/use-autosave";
 import { EditorToolbar } from "./editor-toolbar";
 import { SaveStatus } from "./save-status";
@@ -34,7 +34,7 @@ export function DocumentEditor({ doc, currentUser }: { doc: DocumentDetail; curr
 
   const editor = useEditor({
     extensions: [
-      StarterKit.configure({ heading: { levels: [1, 2, 3] }, link: false }),
+      ...documentExtensions,
       Placeholder.configure({ placeholder: "Start writing…" }),
     ],
     content: doc.content,
